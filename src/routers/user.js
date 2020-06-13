@@ -1,39 +1,62 @@
 const express = require('express');
 const User = require('../models/user');
 const router = express.Router()
+const auth = require('../middleware/auth')
 
-router.post('/users',(request, response)=>{
+router.post('/users', async (request, response)=>{
     const user = new User(request.body);
- 
-    user.save().then((result) => {
-         response.status(201).send(result._id);
-    }).catch((error)=>{
-     response.status(400).send(error.message);
-    })
+    try {
+          await user.save()
+          const token = await user.generateAuthToken();
+          response.status(201).send({user, token});
+    } catch (error) {
+    response.status(400).send(error.message);
+     }
+       
  })
  
+router.post('/users/login', async(request, response)=>{
+    try {
+        const user = await User.findByCredentials(request.body.email, request.body.password);
+        const token = await user.generateAuthToken();
+        response.send({user, token});
+        
+    } catch (error) {
+        response.status(400).send(error.message)
+    }
+})
+
+router.post('/users/logout', auth, async( request, response) => {
+    try {
+            request.user.tokens = request.user.tokens.filter((token) => {
+                return request.token !== token.token
+            });
+
+            await request.user.save();
+            response.send({message:"logged out"});
+        
+    } catch (error) {
+        response.status(500).send(error);
+    }
+})
+
+router.post('/users/logoutAll', auth, async (request, response)=> {
+    try {
+        request.user.tokens = [];
+        await request.user.save();
+        response.send({message:"logged out from all devices"});
+        
+    } catch (error) {
+        response.status(500).send(error);
+    }
+})
  
- router.get('/users', (request, response) => {
-     User.find({}).then((users) => {
-         response.status(200).send(users);
-     }).catch((error)=> {
-         response.status(500).send(error);
-     })
- })
- 
- router.get('/users/:id', (request, response) =>{
-     const _id = request.params.id;
-     User.findById(_id).then((user)=>{
-         if(!user){
-             return response.sendStatus(404);
-         }
-         response.status(200).send(user);
-     }).catch((error) =>{
-         response.status(500).send(error.message);
-     })
+router.get('/users/me', auth, async (request, response) => {
+    response.send(request.user);    
  })
 
- router.patch('/users/:id', async(request, response) =>{
+
+router.patch('/users/me', auth,  async(request, response) =>{
     const updates = Object.keys(request.body);
     const allowedUpdates = ['name', 'email', 'password', 'age'];
     const isValidOperation = updates.every((update) => {
@@ -45,10 +68,16 @@ router.post('/users',(request, response)=>{
     }
 
     try {
-        const user = await User.findByIdAndUpdate(request.params.id, request.body, { new: true, runValidators:true})
-        if(!user){
-            return response.sendStatus(404);
-        }
+        //const user = await User.findByIdAndUpdate(request.params.id, request.body, { new: true, runValidators:true})
+        // const user = await User.findById(request.user._id);
+        // if(!user){
+        //     return response.sendStatus(404);
+        // }
+        const user = request.user;
+        updates.forEach((update)=> {
+            user[update] = request.body[update];
+        })
+        await user.save();
         response.send(user);
         
     } catch (error) {
@@ -56,13 +85,10 @@ router.post('/users',(request, response)=>{
     }
  })
  
- router.delete('/users/:id', async (request, response)=>{
-     try {
-         const user = await User.findByIdAndDelete(request.params.id)
-         if(!user){
-             return response.sendStatus(404);
-         }
-         response.send(user);
+router.delete('/users/me', auth, async (request, response)=>{
+     try {  
+        await request.user.remove();
+        response.send(request.user);
  
      } catch (e) {
          response.status(500).send(e);
