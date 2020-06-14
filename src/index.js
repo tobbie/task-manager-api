@@ -16,11 +16,7 @@ app.get('/', (req, res) => {
 })
 
 
+
 app.listen(port,() =>{
     console.log(`task manager api is running on port ${port}`)
 })
-
-// for(i = 0 ; i  <= 10000000; i++){
-//     console.log(`testing i :${i}`)
-// }
-
