@@ -90,7 +90,7 @@ router.patch('/users/me', auth,  async(request, response) =>{
 router.delete('/users/me', auth, async (request, response)=>{
      try {  
         await request.user.remove();
-        sendCancellationEmail(request.user.email, request.user.name);
+        //sendCancellationEmail(request.user.email, request.user.name);
         response.send(request.user);
  
      } catch (e) {
