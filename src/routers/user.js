@@ -7,17 +7,6 @@ const {sendWelcomeEmail, sendCancellationEmail} = require('../emails/mailer')
 
 
 const router = express.Router()
-const upload = multer({
-    limits: {
-        fileSize: 1000000 //accept file with max size of 1MB.
-    },
-    fileFilter(req, file, cb){
-        if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
-         return  cb(new Error('Please upload an image file.'))
-        }
-        cb(undefined, true);
-    }
-})
 
 router.post('/users', async (request, response)=>{
     const user = new User(request.body);
@@ -85,11 +74,7 @@ router.patch('/users/me', auth,  async(request, response) =>{
     }
 
     try {
-        //const user = await User.findByIdAndUpdate(request.params.id, request.body, { new: true, runValidators:true})
-        // const user = await User.findById(request.user._id);
-        // if(!user){
-        //     return response.sendStatus(404);
-        // }
+        
         const user = request.user;
         updates.forEach((update)=> {
             user[update] = request.body[update];
@@ -112,6 +97,18 @@ router.delete('/users/me', auth, async (request, response)=>{
          response.status(500).send(e);
      }
  })
+
+const upload = multer({
+    limits: {
+        fileSize: 1000000 //accept file with max size of 1MB.
+    },
+    fileFilter(req, file, cb){
+        if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
+         return  cb(new Error('Please upload an image file.'))
+        }
+        cb(undefined, true);
+    }
+})
 
 router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
     //resize and set image on user instance
@@ -146,8 +143,6 @@ router.get('/users/:id/avatar', async (request, response)=>{
             
         }
 })
-
-
 
 
 
