@@ -4,7 +4,7 @@ const auth = require("../middleware/auth");
 const router = express.Router();
 
 //GET /taks?complete=true
-//GET /tasks?limit=10&skip=0 //
+//GET /tasks?limit=10&skip=0 ////
 router.get("/tasks", auth, async (request, response) => {
   const match = {};
   const sort = {};
