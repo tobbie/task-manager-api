@@ -6,7 +6,17 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "env-cmd ./config/dev.env nodemon src/index.js",
-    "debug": "node inspect src/index.js"
+    "debug": "node inspect src/index.js",
+    "test": "env-cmd ./config/test.env jest --coverage --watch --runInBand"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "jest": {
+    "verbose": true,
+    "testEnvironment": "node"
   },
   "keywords": [],
   "author": "",
@@ -14,15 +24,21 @@
   "dependencies": {
     "bcrypt": "^5.0.0",
     "express": "^4.17.1",
+    "husky": "^4.2.5",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.8",
     "mongoose": "^5.9.18",
     "multer": "^1.4.2",
     "postmark": "^2.5.4",
+    "pretty-quick": "^2.0.1",
     "sharp": "^0.25.4",
     "validator": "^13.0.0"
   },
   "devDependencies": {
-    "env-cmd": "^8.0.2"
+    "@types/jest": "^26.0.0",
+    "env-cmd": "^8.0.2",
+    "jest": "^26.0.1",
+    "prettier": "2.0.5",
+    "supertest": "^4.0.2"
   }
 }
