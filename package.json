@@ -7,8 +7,9 @@
     "start": "node src/index.js",
     "dev": "env-cmd ./config/dev.env nodemon src/index.js",
     "debug": "node inspect src/index.js",
-    "tester": "env-cmd ./config/test.env jest --coverage --watch --runInBand",
-    "test": "jest --runInBand"
+    "localtest": "env-cmd ./config/test.env jest --coverage --watch --runInBand",
+    "test": "jest --runInBand",
+    "coverage": "jest --coverage --runInBand"
   },
   "husky": {
     "hooks": {

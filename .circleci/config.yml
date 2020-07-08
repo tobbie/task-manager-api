@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  build:
+  build_test:
     docker:
       - image: circleci/node:12.18 # the primary container, where your job's commands are run
       - image: circleci/mongo:4.0-xenial-ram
@@ -17,3 +17,24 @@ jobs:
             echo $MONGODB_URL
       - run: npm install
       - run: npm test
+  test_coverage:
+    docker:
+      - image: circleci/node:12.18 # the primary container, where your job's commands are run
+      - image: circleci/mongo:4.0-xenial-ram
+    environment:
+      MONGODB_URL: mongodb://127.0.0.1/task-manager-api
+      POSTMARK_TOKEN: 6cbb3ef7-f7e7-4815-9615-a9b5e15ea720
+      JWT_SECRET: taskmanagersecret
+    steps:
+      - checkout # check out the code in the project directory
+      - run: echo "npm installing" # run the `echo` command
+      - run: npm install
+      - run: npm run coverage
+workflows:
+  version: 2
+  build_test_and_coverage:
+    jobs:
+      - build_test
+      - test_coverage:
+          requires:
+            - build_test
