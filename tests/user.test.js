@@ -1,10 +1,16 @@
 const request = require("supertest");
 const app = require("../src/app");
 const User = require("../src/models/user");
-const { testUser, testUserId, setupDatabase } = require("./fixtures/db");
+const {
+  testUser,
+  testUserId,
+  setupDatabase,
+  closeDatabase,
+} = require("./fixtures/db");
 
 describe("user tests", () => {
   beforeEach(setupDatabase);
+  afterAll(closeDatabase);
 
   test("Should signup a new user", async () => {
     await request(app)
