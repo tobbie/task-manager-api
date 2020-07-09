@@ -8,10 +8,12 @@ const {
   testUser2,
   testUser2Id,
   task1,
+  closeDatabase,
 } = require("./fixtures/db");
 
 describe("task tests", () => {
   beforeEach(setupDatabase);
+  afterAll(closeDatabase);
 
   test("should create task for user", async () => {
     const response = await request(app)
