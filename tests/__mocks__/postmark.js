@@ -1,5 +1,6 @@
+//constructor function
 function ServerClient(token) {
-  function sendEmail(email) {}
+  this.sendEmail = () => {};
 }
 
 module.exports = {
